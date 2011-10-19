@@ -93,7 +93,13 @@ module Grit
       if file =~ /\//
         file.split("/").inject(self) { |acc, x| acc/x } rescue nil
       else
-        self.contents.find { |c| c.name == file }
+        contents.find do |c|
+          if file.respond_to?(:encoding)
+            c.name.force_encoding(file.encoding) == file rescue false
+          else
+            c.name == file
+          end
+        end
       end
     end
 
